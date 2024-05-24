@@ -186,7 +186,7 @@ namespace PrmAnEditor
             {
                 Rlgl.DisableBackfaceCulling();
                 Rlgl.PushMatrix();
-                Rlgl.Translatef(layer.position.X, layer.position.Y, layer.position.Z);
+                Rlgl.Translatef(layer.position.X * (Raylib.GetScreenWidth() / 1280.0f), layer.position.Y * (Raylib.GetScreenHeight() / 720.0f), layer.position.Z);
                 Rlgl.Rotatef(layer.rotation.Y, 0.0f, 0.1f, 0.0f);
                 Rlgl.Rotatef(layer.rotation.X, 0.1f, 0.0f, 0.0f);
                 Rlgl.Rotatef(layer.rotation.Z, 0.0f, 0.0f, 0.1f);
@@ -217,13 +217,13 @@ namespace PrmAnEditor
                         Rlgl.Vertex2f(0.0f, 0.0f);
 
                         Rlgl.TexCoord2f(layer.uv.X / texSize.X, (layer.uv.Y + layer.uv.W) / texSize.Y);
-                        Rlgl.Vertex2f(0.0f, layer.uv.W * (720.0f / Raylib.GetScreenHeight()));
+                        Rlgl.Vertex2f(0.0f, layer.uv.W * (Raylib.GetScreenHeight() / 720.0f));
 
                         Rlgl.TexCoord2f((layer.uv.X + layer.uv.Z) / texSize.X, (layer.uv.Y + layer.uv.W) / texSize.Y);
-                        Rlgl.Vertex2f(layer.uv.Z * (1280.0f / Raylib.GetScreenWidth()), layer.uv.W * (720.0f / Raylib.GetScreenHeight()));
+                        Rlgl.Vertex2f(layer.uv.Z * (Raylib.GetScreenWidth() / 1280.0f), layer.uv.W * (Raylib.GetScreenHeight() / 720.0f));
 
                         Rlgl.TexCoord2f((layer.uv.X + layer.uv.Z) / texSize.X, layer.uv.Y / texSize.Y);
-                        Rlgl.Vertex2f(layer.uv.Z * (1280.0f / Raylib.GetScreenWidth()), 0.0f);
+                        Rlgl.Vertex2f(layer.uv.Z * (Raylib.GetScreenWidth() / 1280.0f), 0.0f);
 
                         Rlgl.End();
                         break;

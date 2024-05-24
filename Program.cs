@@ -12,6 +12,7 @@ namespace PrmAnEditor
     internal class Program
     {
         static string filePath = "";
+        static string sprFilePath = "";
         static int texUsing = 0;
         static int frameUsing = 0;
         static int layerUsing = 0;
@@ -28,9 +29,11 @@ namespace PrmAnEditor
         [STAThread]
         static void Main(string[] args)
         {
+            Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
             Raylib.InitWindow(1280, 720, "PrmAnEditor");
             Raylib.SetTargetFPS(60);
             rlImGui.Setup(true);
+            SprAnManager.LoadShader();
 
             Camera3D cam = new Camera3D();
             cam.FovY = 45.0f;
@@ -79,6 +82,8 @@ namespace PrmAnEditor
             }
 
             PrmAnManager.Close();
+            SprAnManager.UnloadShader();
+            SprAnManager.CloseDPSpr();
             rlImGui.Shutdown();
             Raylib.CloseWindow();
         }
@@ -103,7 +108,7 @@ namespace PrmAnEditor
                     if (ImGui.MenuItem("Open PrmAn"))
                     {
                         filePath = OpenFile("Open PrmAn file", "PrmAn|*.prman");
-                        if (filePath.Length > 0)
+                        if (File.Exists(filePath))
                         {
                             PrmAnManager.Load(filePath);
                             frameUsing = 0;
@@ -130,9 +135,58 @@ namespace PrmAnEditor
                     ImGui.EndMenu();
                 }
 
-                if(ImGui.BeginMenu("SprAn"))
+                if (ImGui.BeginMenu("SprAn"))
                 {
+                    if (ImGui.MenuItem("New SprAn"))
+                        SprAnManager.New();
 
+                    if (ImGui.MenuItem("Open SprAn"))
+                    {
+                        sprFilePath = OpenFile("Open SprAn file", "SprAn|*.spran");
+                        if (File.Exists(sprFilePath))
+                            SprAnManager.Load(sprFilePath);
+                    }
+
+                    if(ImGui.MenuItem("Save SprAn"))
+                    {
+                        if (sprFilePath.Length == 0)
+                            sprFilePath = SaveFile("Save SprAn File", "SprAn|*.spran");
+                        if (sprFilePath.Length > 0)
+                            SprAnManager.Save(sprFilePath);
+                    }
+
+                    if(ImGui.MenuItem("Save SprAn As"))
+                    {
+                        sprFilePath = SaveFile("Save SprAn File", "SprAn|*.spran");
+                        if (sprFilePath.Length > 0)
+                            SprAnManager.Save(sprFilePath);
+                    }
+
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+
+                    if(ImGui.MenuItem("Load DPSpr With BasePal"))
+                    {
+                        string path = OpenFile("Open DPSpr File", "DPSpr|*.dpspr");
+                        if (File.Exists(path))
+                            SprAnManager.LoadDPSpr(path, true);
+                    }
+
+                    if (ImGui.MenuItem("Load DPSpr With Index"))
+                    {
+                        string path = OpenFile("Open DPSpr File", "DPSpr|*.dpspr");
+                        if (File.Exists(path))
+                            SprAnManager.LoadDPSpr(path, false);
+                    }
+
+                    if(ImGui.MenuItem("Load DPSpr Palette Tex"))
+                    {
+
+                    }
+
+                    if (ImGui.MenuItem("Close DPSpr"))
+                        SprAnManager.CloseDPSpr();
 
                     ImGui.EndMenu();
                 }
