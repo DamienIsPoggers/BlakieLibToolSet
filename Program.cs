@@ -60,6 +60,8 @@ namespace PrmAnEditor
                 Raylib.DrawLine3D(new Vector3(-25.0f, 0.0f, 0.0f), new Vector3(25.0f, 0.0f, 0.0f), Color.Gray);
                 Raylib.DrawLine3D(new Vector3(0.0f, -25.0f, 0.0f), new Vector3(0.0f, 25.0f, 0.0f), Color.Gray);
 
+                SprAnManager.DrawSprites();
+
                 if (!renderAnim && PrmAnManager.prmAn.frames.Count > 0)
                 {
                     if(blend && PrmAnManager.prmAn.frames.ContainsKey(blendFrame))
@@ -77,7 +79,7 @@ namespace PrmAnEditor
                 rlImGui.Begin();
                 DrawUI();
                 rlImGui.End();
-
+                Raylib.DrawFPS(10, 10);
                 Raylib.EndDrawing();
             }
 
@@ -182,7 +184,9 @@ namespace PrmAnEditor
 
                     if(ImGui.MenuItem("Load DPSpr Palette Tex"))
                     {
-
+                        string path = OpenFile("Open Texture for palette", "PNG|*.png");
+                        if(File.Exists(path))
+                            SprAnManager.LoadPal(path);
                     }
 
                     if (ImGui.MenuItem("Close DPSpr"))
@@ -197,7 +201,8 @@ namespace PrmAnEditor
             ImGui.EndMainMenuBar();
             #endregion
 
-            if(ImGui.Begin("PrmAn"))
+            #region Prman
+            if (ImGui.Begin("PrmAn"))
             {
                 if(ImGui.TreeNode("Animations"))
                 {
@@ -424,6 +429,15 @@ namespace PrmAnEditor
                 EndTextures:
                 ImGui.End();
             }
+            #endregion
+
+            #region spran
+            if(ImGui.Begin("SprAn"))
+            {
+                SprAnManager.DrawUI();
+                ImGui.End();
+            }
+            #endregion
         }
 
         public static string OpenFile(string title, string filter)
