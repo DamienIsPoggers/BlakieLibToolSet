@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BlakieLibSharp;
 using Raylib_cs;
+using static System.Windows.Forms.AxHost;
 
 namespace PrmAnEditor
 {
@@ -103,6 +104,13 @@ namespace PrmAnEditor
             PrmAn.Texture tex;
             prmAn.textures.Remove(oldId, out tex);
             prmAn.textures.Add(newId, tex);
+        }
+
+        public static void ReKeyAnim(string oldName, string newName)
+        {
+            PrmAn.Animation anim;
+            prmAn.animations.Remove(oldName, out anim);
+            prmAn.animations.Add(newName, anim);
         }
 
         public static void AddAnimation()
@@ -240,6 +248,45 @@ namespace PrmAnEditor
         {
             foreach (PrmAn.Texture tex in textures.Values)
                 Rlgl.UnloadTexture(tex.glTexId);
+        }
+
+        public static void AddFrameAnim(PrmAn.Animation anim)
+        {
+            string[] frames = anim.frames;
+            int[] times = anim.frameTimes;
+            anim.frames = new string[anim.frameCount + 1];
+            anim.frameTimes = new int[anim.frameCount + 1];
+            Array.Copy(frames, anim.frames, anim.frameCount);
+            Array.Copy(times, anim.frameTimes, anim.frameCount);
+            anim.frames[anim.frameCount] = "";
+            anim.frameTimes[anim.frameCount] = 0;
+            anim.frameCount++;
+        }
+
+        public static void RemoveFrameAnim(PrmAn.Animation anim, int num)
+        {
+            string[] frames = anim.frames;
+            int[] times = anim.frameTimes;
+            anim.frames = new string[anim.frameCount - 1];
+            anim.frameTimes = new int[anim.frameCount - 1];
+            if (num == 0)
+            {
+                Array.Copy(frames, 1, anim.frames, 0, frames.Length - 1);
+                Array.Copy(times, 1, anim.frameTimes, 0, frames.Length - 1);
+            }
+            else if (num == anim.frameCount - 1)
+            {
+                Array.Copy(frames, 0, anim.frames, 0, frames.Length - 1);
+                Array.Copy(times, 0, anim.frameTimes, 0, frames.Length - 1);
+            }
+            else
+            {
+                Array.Copy(frames, 0, anim.frames, 0, num);
+                Array.Copy(frames, num + 1, anim.frames, num, frames.Length - num - 1);
+                Array.Copy(times, 0, anim.frameTimes, 0, num);
+                Array.Copy(times, num + 1, anim.frameTimes, num, frames.Length - num - 1);
+            }
+            anim.frameCount--;
         }
     }
 }

@@ -64,11 +64,30 @@ namespace PrmAnEditor
 
                 if (!renderAnim && PrmAnManager.prmAn.frames.Count > 0)
                 {
+                    animTimer = 0;
                     if(blend && PrmAnManager.prmAn.frames.ContainsKey(blendFrame))
                         PrmAnManager.Draw(PrmAnManager.prmAn.frames.Keys.ToArray()[frameUsing], blendFrame, blendAmount);
                     else
                         PrmAnManager.Draw(PrmAnManager.prmAn.frames.Keys.ToArray()[frameUsing], "", 0.0f);
                 }
+                else if(renderAnim && PrmAnManager.prmAn.animations.Count > 0)
+                {
+                    PrmAn.Animation anim = PrmAnManager.prmAn.GetAnim(PrmAnManager.prmAn.animations.Keys.ToArray()[animUsing]);//ugly af
+                    animTimer++;
+                    if(animTimer >= anim.frameTimes[animFrameUsing])
+                    {
+                        animTimer = 0;
+                        animFrameUsing++;
+                        if (animFrameUsing >= anim.frameCount)
+                            animFrameUsing = 0;
+                    }
+
+                    if (animFrameUsing + 1 >= anim.frameCount)
+                        PrmAnManager.Draw(anim.frames[animFrameUsing], "", 0.0f);
+                    else
+                        PrmAnManager.Draw(anim.frames[animFrameUsing], anim.frames[animFrameUsing + 1], (float)animTimer / (float)anim.frameTimes[animFrameUsing]);
+                }
+
                 if (PrmAnManager.prmAn.frames.ContainsKey(multipleSprite))
                     PrmAnManager.Draw(multipleSprite, "", 0.0f);
 
@@ -232,7 +251,43 @@ namespace PrmAnEditor
                         }
                     }
 
+                    ImGui.Checkbox("Play Anim", ref renderAnim);
+
                     ImGui.Combo("Animation", ref animUsing, animNames, animNames.Length);
+
+                    PrmAn.Animation anim = PrmAnManager.prmAn.animations.Values.ToArray()[animUsing];
+                    string animName = anim.name;
+                    ImGui.InputText("Anim Name", ref animName, 255);
+                    if(animName != anim.name)
+                    {
+                        PrmAnManager.ReKeyAnim(anim.name, animName);
+                        anim.name = animName;
+                    }    
+                    ImGui.SetNextItemWidth(150.0f);
+                    if (ImGui.Button("Add Frame"))
+                        PrmAnManager.AddFrameAnim(anim);
+                    if(anim.frameCount <= 0)
+                    {
+                        ImGui.Text("No Frames in anim");
+                        ImGui.TreePop();
+                        goto EndAnims;
+                    }
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(150.0f);
+                    if(ImGui.Button("Remove Frame"))
+                    {
+                        PrmAnManager.RemoveFrameAnim(anim, animFrameUsing);
+                        animFrameUsing--;
+                        if (animFrameUsing <= 0)
+                            animFrameUsing = 0;
+                        ImGui.TreePop();
+                        goto EndAnims;
+                    }
+                    ImGui.SliderInt("Frame Num", ref animFrameUsing, 0, anim.frameCount - 1);
+
+                    ImGui.InputText("Frame", ref anim.frames[animFrameUsing], 255);
+
+                    ImGui.InputInt("Length", ref anim.frameTimes[animFrameUsing]);
 
                     ImGui.TreePop();
                 }
@@ -356,6 +411,8 @@ namespace PrmAnEditor
 
                         ImGui.Checkbox("Additive", ref layer.additive);
                         ImGui.Checkbox("Draw In 2D", ref layer.drawIn2d);
+                        ImGui.Checkbox("Blend UV", ref layer.blendUv);
+                        ImGui.Checkbox("Allow blending", ref layer.allowBlending);
                         frame.layers[layerUsing] = layer;
                     }
                     else
