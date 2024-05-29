@@ -406,6 +406,9 @@ namespace PrmAnEditor
                         ImGui.ColorEdit4("Color Add", ref color);
                         layer.colAdd[0] = (byte)(color.X * 255); layer.colAdd[1] = (byte)(color.Y * 255);
                         layer.colAdd[2] = (byte)(color.Z * 255); layer.colAdd[3] = (byte)(color.W * 255);
+                        int palNum = layer.palNum;
+                        ImGui.InputInt("Palette Num", ref palNum);
+                        layer.palNum = (sbyte)palNum;
 
                         ImGui.InputInt("TexId", ref layer.texId);
 

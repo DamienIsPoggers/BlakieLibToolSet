@@ -137,6 +137,9 @@ namespace PrmAnEditor
                     continue;
                 }
 
+                if (layer.palNum >= 0)
+                    SprAnManager.SetShader();
+
                 Rlgl.DisableBackfaceCulling();
                 Rlgl.PushMatrix();
                 Rlgl.Translatef(layer.position.X, layer.position.Y, layer.position.Z);
@@ -185,6 +188,7 @@ namespace PrmAnEditor
                 Rlgl.PopMatrix();
                 Raylib.EndBlendMode();
                 Rlgl.SetTexture(0);
+                Raylib.EndShaderMode();
             }
         }
 
@@ -192,6 +196,9 @@ namespace PrmAnEditor
         {
             foreach(PrmAn.Layer layer in layersIn2D)
             {
+                if (layer.palNum >= 0)
+                    SprAnManager.SetShader();
+
                 Rlgl.DisableBackfaceCulling();
                 Rlgl.PushMatrix();
                 Rlgl.Translatef(layer.position.X * (Raylib.GetScreenWidth() / 1280.0f), layer.position.Y * (Raylib.GetScreenHeight() / 720.0f), layer.position.Z);
@@ -240,6 +247,7 @@ namespace PrmAnEditor
                 Rlgl.PopMatrix();
                 Raylib.EndBlendMode();
                 Rlgl.SetTexture(0);
+                Raylib.EndShaderMode();
             }
             layersIn2D.Clear();
         }

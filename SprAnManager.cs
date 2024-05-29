@@ -81,6 +81,12 @@ namespace PrmAnEditor
             Raylib.UnloadTexture(palTexture);
         }
 
+        public static void SetShader()
+        {
+            Raylib.BeginShaderMode(palShader);
+            Raylib.SetShaderValueTexture(palShader, palLoc, palTexture);
+        }
+
         public static void New()
         {
             sprAn = new SprAn();
@@ -281,6 +287,8 @@ namespace PrmAnEditor
 
 
                     ImGui.SliderInt("Current Collider", ref curCol, 0, frame.colliderCount - 1);
+                    if (curCol >= frame.colliderCount)
+                        curCol = frame.colliderCount - 1;
                     ref RectCollider col = ref frame.colliders[curCol];
 
                     if (ImGui.BeginCombo("Collider Type", Enum.GetNames(typeof(ColliderType))[(int)col.colliderType]))
@@ -463,7 +471,7 @@ namespace PrmAnEditor
             state.frames = new SprAnFrame[frames.Length + 1];
             Array.Copy(frames, state.frames, frames.Length);
             state.frameCount++;
-            state.frames[frames.Length] = copyFrame ? frames[frames.Length - 1].Copy() : new SprAnFrame();
+            state.frames[frames.Length] = copyFrame ? frames[curFrame].Copy() : new SprAnFrame();
             curCol = 0;
             curUv = 0;
             curFrame++;
