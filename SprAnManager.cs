@@ -31,10 +31,12 @@ namespace PrmAnEditor
         uniform mat4 mvp;
 
         out vec2 fragTexCoord;
+        out vec4 fragColor;
 
         void main()
         {
             fragTexCoord = vertexTexCoord;
+            fragColor = vertexColor;
 
             gl_Position = mvp*vec4(vertexPosition, 1.0);
         }
@@ -43,6 +45,7 @@ namespace PrmAnEditor
         #version 330
 
         in vec2 fragTexCoord;
+        in vec4 fragColor;
 
         uniform sampler2D sprite;
         uniform sampler2D palette;
@@ -53,7 +56,7 @@ namespace PrmAnEditor
         {
             float colIndex = texture(sprite, fragTexCoord).r;
 
-            finalColor = texture(palette, vec2(colIndex, 0.0f));
+            finalColor = texture(palette, vec2(colIndex, 0.0f)) * fragColor;
         }
         ";
 
@@ -387,13 +390,13 @@ namespace PrmAnEditor
             if (sprite.glTexId == 0)
                 return;
 
-            Rlgl.SetTexture(sprite.glTexId);
-            Rlgl.DisableBackfaceCulling();
-            if (sprite.indexed && palTexture.Id != 0)
+            if (sprite.indexed)
             {
                 Raylib.BeginShaderMode(palShader);
                 Raylib.SetShaderValueTexture(palShader, palLoc, palTexture);
             }
+            Rlgl.SetTexture(sprite.glTexId);
+            Rlgl.DisableBackfaceCulling();
 
             Rlgl.PushMatrix();
             {
